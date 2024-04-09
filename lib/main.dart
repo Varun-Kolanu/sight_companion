@@ -1,9 +1,6 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:sight_companion/pages/Home.dart';
-import 'package:sight_companion/pages/bar_code_scanner.dart';
-import 'package:sight_companion/pages/braille_reader.dart';
-import 'package:sight_companion/pages/object_detection.dart';
 import 'package:sight_companion/pages/ocr.dart';
 import 'package:sight_companion/utils/speech_to_text.dart';
 import 'package:sight_companion/utils/text_to_speech.dart';

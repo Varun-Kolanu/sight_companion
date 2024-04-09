@@ -6,7 +6,6 @@ import 'package:sight_companion/utils/text_to_speech.dart';
 import 'package:tflite_v2/tflite_v2.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
-import 'package:palette_generator/palette_generator.dart';
 
 class ObjectDetectionPage extends StatefulWidget {
   final XFile? imageFile;
@@ -23,6 +22,7 @@ class _ObjectDetectionPageState extends State<ObjectDetectionPage> {
   double _imageHeight = 0;
   double _imageWidth = 0;
   bool _busy = false;
+  bool loading = false;
 
   MyTts tts = MyTts();
 
@@ -53,9 +53,21 @@ class _ObjectDetectionPageState extends State<ObjectDetectionPage> {
         .where((re) => re["confidenceInClass"] >= 0.45)
         .map((re) => re["detectedClass"]);
 
+    setState(() {
+      loading = true;
+    });
     await tts.speak("The objects infront of you are ");
+    setState(() {
+      loading = true;
+    });
     for (String word in classes) {
+      setState(() {
+        loading = true;
+      });
       await tts.speak(word);
+      setState(() {
+        loading = true;
+      });
       // Add some delay between speaking each word if needed
       await Future.delayed(const Duration(seconds: 1));
     }
@@ -180,7 +192,9 @@ class _ObjectDetectionPageState extends State<ObjectDetectionPage> {
       body: Stack(
         children: stackChildren,
       ),
-      floatingActionButton: const ListeningFloatingActionButton(),
+      floatingActionButton: loading
+          ? const CircularProgressIndicator()
+          : const ListeningFloatingActionButton(),
     );
   }
 }

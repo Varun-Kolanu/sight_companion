@@ -71,7 +71,7 @@ class MyTts {
 
   Future<void> speak(String text) async {
     while (!(await flutterTts.isLanguageAvailable("en-US"))) {
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 1));
       continue;
     }
     var result = await flutterTts.speak(text);

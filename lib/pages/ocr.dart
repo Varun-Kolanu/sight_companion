@@ -77,7 +77,9 @@ class OcrState extends State<Ocr> {
                 ),
               ),
             ),
-            floatingActionButton: const ListeningFloatingActionButton(),
+            floatingActionButton: loading
+                ? const CircularProgressIndicator()
+                : const ListeningFloatingActionButton(),
           );
   }
 }

@@ -80,57 +80,57 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Home Page'),
       ),
-      body: loading
-          ? const CircularProgressIndicator()
-          : SingleChildScrollView(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      GridView.count(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        shrinkWrap: true,
-                        children: [
-                          MediumButton(
-                            color: Colors.green,
-                            text: 'QR Scanner',
-                            onTap: () => _qrHandler(context),
-                          ),
-                          MediumButton(
-                            color: Colors.orange,
-                            text: 'Object Detection',
-                            onTap: () => _objectDetectionHandler(context),
-                          ),
-                          MediumButton(
-                            color: Colors.blue,
-                            text: 'Document Scanner',
-                            onTap: () {
-                              Navigator.pushNamed(context, '/ocr');
-                            },
-                          ),
-                          MediumButton(
-                            color: Colors.purple,
-                            text: 'Color Detection',
-                            onTap: () => _colorHandler(context),
-                          ),
-                        ],
-                      ),
-                      const Points(
-                        points: [
-                          '1: Tap on microphone to Start/Stop',
-                          '2: You need not navigate by clicking. Just say "Open <page you want to open>"',
-                          '3: Eg., "Open QR Scanner" or "Open Barcode Scanner" etc',
-                        ],
-                      ),
-                    ],
-                  ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  shrinkWrap: true,
+                  children: [
+                    MediumButton(
+                      color: Colors.green,
+                      text: 'QR Scanner',
+                      onTap: () => _qrHandler(context),
+                    ),
+                    MediumButton(
+                      color: Colors.orange,
+                      text: 'Object Detection',
+                      onTap: () => _objectDetectionHandler(context),
+                    ),
+                    MediumButton(
+                      color: Colors.blue,
+                      text: 'Document Scanner',
+                      onTap: () {
+                        Navigator.pushNamed(context, '/ocr');
+                      },
+                    ),
+                    MediumButton(
+                      color: Colors.purple,
+                      text: 'Color Detection',
+                      onTap: () => _colorHandler(context),
+                    ),
+                  ],
                 ),
-              ),
+                const Points(
+                  points: [
+                    '1: Tap on microphone to Start/Stop',
+                    '2: You need not navigate by clicking. Just say "Open <page you want to open>"',
+                    '3: Eg., "Open QR Scanner" or "Open Barcode Scanner" etc',
+                  ],
+                ),
+              ],
             ),
-      floatingActionButton: const ListeningFloatingActionButton(),
+          ),
+        ),
+      ),
+      floatingActionButton: loading
+          ? const CircularProgressIndicator()
+          : const ListeningFloatingActionButton(),
     );
   }
 }
