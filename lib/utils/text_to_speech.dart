@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:sight_companion/utils/tts_state.dart';
 
 class MyTts {
-  late FlutterTts _flutterTts;
+  late FlutterTts flutterTts;
   String? engine;
   TtsState ttsState = TtsState.initialized;
 
@@ -18,7 +18,7 @@ class MyTts {
   bool get isAndroid => !kIsWeb && Platform.isAndroid;
 
   MyTts._internal() {
-    _flutterTts = FlutterTts();
+    flutterTts = FlutterTts();
     initTts();
   }
 
@@ -28,62 +28,66 @@ class MyTts {
       await _getDefaultEngine();
     }
 
-    _flutterTts.setStartHandler(() {
+    flutterTts.setStartHandler(() {
       ttsState = TtsState.playing;
     });
 
-    _flutterTts.setCompletionHandler(() {
+    flutterTts.setCompletionHandler(() {
       ttsState = TtsState.stopped;
     });
 
-    _flutterTts.setCancelHandler(() {
+    flutterTts.setCancelHandler(() {
       ttsState = TtsState.stopped;
     });
 
-    _flutterTts.setPauseHandler(() {
+    flutterTts.setPauseHandler(() {
       ttsState = TtsState.paused;
     });
 
-    _flutterTts.setContinueHandler(() {
+    flutterTts.setContinueHandler(() {
       ttsState = TtsState.continued;
     });
 
-    _flutterTts.setErrorHandler((msg) {
+    flutterTts.setErrorHandler((msg) {
       ttsState = TtsState.stopped;
     });
   }
 
   Future<void> _setAwaitOptions() async {
-    await _flutterTts.awaitSpeakCompletion(true);
-    await _flutterTts.setLanguage("en-US");
+    await flutterTts.awaitSpeakCompletion(true);
+    await flutterTts.setLanguage("en-US");
   }
 
   Future<void> _getDefaultEngine() async {
-    engine = await _flutterTts.getDefaultEngine;
+    engine = await flutterTts.getDefaultEngine;
   }
 
   Future<void> stop() async {
-    var result = await _flutterTts.stop();
+    var result = await flutterTts.stop();
     if (result == 1) {
       ttsState = TtsState.stopped;
     }
   }
 
   Future<void> speak(String text) async {
-    var result = await _flutterTts.speak(text);
+    while (!(await flutterTts.isLanguageAvailable("en-US"))) {
+      await Future.delayed(const Duration(seconds: 2));
+      continue;
+    }
+    var result = await flutterTts.speak(text);
     if (result == 1) {
       ttsState = TtsState.playing;
     }
   }
 
   Future<void> pause() async {
-    var result = await _flutterTts.pause();
+    var result = await flutterTts.pause();
     if (result == 1) {
       ttsState = TtsState.paused;
     }
   }
 
   Future<void> setLanguage(String language) async {
-    await _flutterTts.setLanguage(language);
+    await flutterTts.setLanguage(language);
   }
 }

@@ -1,13 +1,17 @@
 import 'dart:io';
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:sight_companion/components/listening_floating.dart';
+import 'package:sight_companion/utils/text_to_speech.dart';
 import 'package:tflite_v2/tflite_v2.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:palette_generator/palette_generator.dart';
 
 class ObjectDetectionPage extends StatefulWidget {
-  const ObjectDetectionPage({super.key});
+  final XFile? imageFile;
+
+  const ObjectDetectionPage({super.key, this.imageFile});
 
   @override
   State<ObjectDetectionPage> createState() => _ObjectDetectionPageState();
@@ -20,7 +24,7 @@ class _ObjectDetectionPageState extends State<ObjectDetectionPage> {
   double _imageWidth = 0;
   bool _busy = false;
 
-  Color? dominantColor;
+  MyTts tts = MyTts();
 
   Future pickImageAndPredict() async {
     var image = await ImagePicker().pickImage(source: ImageSource.camera);
@@ -45,13 +49,22 @@ class _ObjectDetectionPageState extends State<ObjectDetectionPage> {
       numResultsPerClass: 1,
     );
 
+    var classes = recognitions!
+        .where((re) => re["confidenceInClass"] >= 0.45)
+        .map((re) => re["detectedClass"]);
+
+    await tts.speak("The objects infront of you are ");
+    for (String word in classes) {
+      await tts.speak(word);
+      // Add some delay between speaking each word if needed
+      await Future.delayed(const Duration(seconds: 1));
+    }
+
     setState(() {
       _image = File(image.path);
       _recognitions = recognitions;
       _busy = false;
     });
-
-    print(await _calculateDominantColor());
   }
 
   @override
@@ -59,11 +72,13 @@ class _ObjectDetectionPageState extends State<ObjectDetectionPage> {
     super.initState();
 
     _busy = true;
+    _image = File(widget.imageFile!.path);
 
     loadModel().then((val) {
       setState(() {
         _busy = false;
       });
+      predictImage(File(widget.imageFile!.path));
     });
   }
 
@@ -88,7 +103,7 @@ class _ObjectDetectionPageState extends State<ObjectDetectionPage> {
     double factorY = _imageHeight / _imageWidth * screen.width;
     Color blue = const Color.fromRGBO(37, 213, 253, 1.0);
     return _recognitions!.map((re) {
-      if (re["confidenceInClass"] < 0.5) {
+      if (re["confidenceInClass"] < 0.45) {
         return Container();
       }
       return Positioned(
@@ -117,63 +132,33 @@ class _ObjectDetectionPageState extends State<ObjectDetectionPage> {
     }).toList();
   }
 
-  int _colorDistance(Color a, Color b) {
-    return (a.red - b.red) * (a.red - b.red) +
-        (a.green - b.green) * (a.green - b.green) +
-        (a.blue - b.blue) * (a.blue - b.blue);
-  }
-
-  Future<String> _calculateDominantColor() async {
-    Uint8List bytes = await _image.readAsBytes();
-    ImageProvider<Object> imageProvider =
-        MemoryImage(Uint8List.fromList(bytes));
-    PaletteGenerator paletteGenerator =
-        await PaletteGenerator.fromImageProvider(
-      imageProvider,
-    );
-    Color? domColor = paletteGenerator.dominantColor?.color;
-
-    Map<String, Color> colorMap = {
-      'White': Colors.white,
-      'Black': Colors.black,
-      'Blue': Colors.blue,
-      'Red': Colors.red,
-      'Yellow': Colors.yellow,
-      'Grey': Colors.grey,
-      'Orange': Colors.orange,
-      'Purple': Colors.purple,
-      'Green': Colors.green,
-      'Brown': Colors.brown,
-      'Pink': Colors.pink,
-      'Cyan': Colors.cyan
-    };
-    int minDistance = 200000;
-    String nearestColor = '';
-    for (var entry in colorMap.entries) {
-      int colorDist = _colorDistance(domColor!, entry.value);
-      if (colorDist < minDistance) {
-        minDistance = colorDist;
-        nearestColor = entry.key;
-      }
-    }
-    return nearestColor;
-  }
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     List<Widget> stackChildren = [];
 
-    stackChildren.add(Positioned(
-      top: 0.0,
-      left: 0.0,
-      width: size.width,
-      child: _image.path.isEmpty
-          ? const Text('No image selected.')
-          : Image.file(_image),
-    ));
+    stackChildren.add(
+      ElevatedButton(
+        onPressed: pickImageAndPredict,
+        child: const Text("Open Camera"),
+      ),
+    );
+    stackChildren.add(
+      Positioned(
+        top: 0.0,
+        left: 0.0,
+        width: size.width,
+        child: _image.path.isEmpty
+            ? const Text('No image selected.')
+            : Image.file(_image),
+      ),
+    );
 
     stackChildren.addAll(renderBoxes(size));
+    stackChildren.add(ElevatedButton(
+      onPressed: pickImageAndPredict,
+      child: const Text("Open Camera"),
+    ));
 
     if (_busy) {
       stackChildren.add(const Opacity(
@@ -195,11 +180,7 @@ class _ObjectDetectionPageState extends State<ObjectDetectionPage> {
       body: Stack(
         children: stackChildren,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: pickImageAndPredict,
-        tooltip: 'Pick Image',
-        child: const Icon(Icons.image),
-      ),
+      floatingActionButton: const ListeningFloatingActionButton(),
     );
   }
 }
