@@ -16,22 +16,13 @@ class _SpeechToTextHomePageState extends State<SpeechToTextHomePage> {
 
   Future<void> _click() async {
     if (_status != SttState.listening) {
-      setState(() {
-        _status = SttState.listening;
-      });
       await _stt.startListening();
-      // setState(() {
-      //   _status = SttState.stopped;
-      // });
     } else {
       await _stt.stopListening();
-      setState(() {
-        _status = SttState.stopped;
-      });
     }
   }
 
-  void _listenHandler(String text, SttState status) {
+  void _listenHandler(String text, SttState status, String emitted) {
     setState(() {
       _text = text;
       _status = status;

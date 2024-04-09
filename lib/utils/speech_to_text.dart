@@ -3,7 +3,10 @@ import 'package:speech_to_text/speech_to_text.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 
 typedef SpeechRecognitionResultCallback = void Function(
-    String text, SttState status);
+  String text,
+  SttState status,
+  String emitted,
+);
 
 class MyStt {
   late SpeechToText stt;
@@ -28,13 +31,17 @@ class MyStt {
         onStatus: (status) {
           print('status: $status');
           if (status == 'done') {
-            callback?.call(lastWords, SttState.stopped);
+            lastWords = "";
+            callback?.call(lastWords, SttState.stopped, 'done');
+          } else {
+            callback?.call(lastWords, SttState.listening, 'listening');
           }
           hasSpeech = true;
         },
         onError: (error) {
           print('error: $error');
-          callback?.call(lastWords, SttState.stopped);
+          lastWords = "";
+          callback?.call(lastWords, SttState.stopped, 'stop');
           hasSpeech = false;
         },
       );
@@ -55,7 +62,7 @@ class MyStt {
         onResult: (SpeechRecognitionResult result) {
           lastWords = result.recognizedWords;
           print(result.recognizedWords);
-          callback?.call(result.recognizedWords, SttState.listening);
+          callback?.call(result.recognizedWords, SttState.listening, 'result');
         },
         listenOptions: listenOptions);
   }
@@ -63,5 +70,7 @@ class MyStt {
   Future<void> stopListening() async {
     await stt.stop();
     print("Stopped Listening...");
+    lastWords = "";
+    callback?.call(lastWords, SttState.stopped, 'done');
   }
 }
