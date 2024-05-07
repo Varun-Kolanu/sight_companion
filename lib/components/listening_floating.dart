@@ -22,11 +22,10 @@ class ListeningFloatingActionButton extends StatefulWidget {
 
 class _ListeningFloatingActionButtonState
     extends State<ListeningFloatingActionButton> {
-  final MyStt _stt = MyStt();
+  final Stt _stt = Stt();
   SttState _status = SttState.stopped;
   String _text = "";
-  MyTts tts = MyTts();
-  bool loading = false;
+  Tts tts = Tts();
 
   @override
   void initState() {
@@ -63,22 +62,10 @@ class _ListeningFloatingActionButtonState
               ));
           Uri? uri = Uri.tryParse(res);
           if (uri != null && uri.hasScheme && uri.hasAuthority) {
-            setState(() {
-              loading = true;
-            });
             await tts.speak("Opening domain ${uri.host}");
-            setState(() {
-              loading = false;
-            });
             await _launchInBrowserView(uri);
           } else {
-            setState(() {
-              loading = true;
-            });
             await tts.speak("The url is not valid. QR returned $res");
-            setState(() {
-              loading = false;
-            });
           }
         } else if (lower.contains("ocr") ||
             lower.contains("document") ||
@@ -91,14 +78,7 @@ class _ListeningFloatingActionButtonState
 
             recognizedText = await textRecognizer
                 .processImage(InputImage.fromFile(File(image.path)));
-            setState(() {
-              _text = recognizedText.text;
-              loading = true;
-            });
             await tts.speak(recognizedText.text);
-            setState(() {
-              loading = false;
-            });
             await Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -117,13 +97,7 @@ class _ListeningFloatingActionButtonState
         } else if (lower.contains('color') || lower.contains('colour')) {
           var image = await ImagePicker().pickImage(source: ImageSource.camera);
           String color = await calculateDominantColor(image);
-          setState(() {
-            loading = true;
-          });
           await tts.speak("It is $color color");
-          setState(() {
-            loading = false;
-          });
         }
       }
     }
@@ -139,13 +113,10 @@ class _ListeningFloatingActionButtonState
 
   @override
   Widget build(BuildContext context) {
-    return loading
-        ? const CircularProgressIndicator()
-        : FloatingActionButton(
-            onPressed: _handleButtonClick,
-            tooltip: 'Start/Stop Listening',
-            child: Icon(
-                _status == SttState.listening ? Icons.mic : Icons.mic_none),
-          );
+    return FloatingActionButton(
+      onPressed: _handleButtonClick,
+      tooltip: 'Start/Stop Listening',
+      child: Icon(_status == SttState.listening ? Icons.mic : Icons.mic_none),
+    );
   }
 }

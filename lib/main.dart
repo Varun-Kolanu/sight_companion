@@ -1,12 +1,17 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
-import 'package:sight_companion/pages/Home.dart';
+// import 'package:sight_companion/pages/home2.dart';
+import 'package:sight_companion/pages/home_screen.dart';
 import 'package:sight_companion/pages/ocr.dart';
+import 'package:sight_companion/utils/object_detection.dart';
 import 'package:sight_companion/utils/speech_to_text.dart';
 import 'package:sight_companion/utils/text_to_speech.dart';
 
 void main() async {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    const MyApp(),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -14,11 +19,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MyTts();
-    MyStt();
+    Tts();
+    Stt();
+    ObjectDetector();
     return MaterialApp(
-      title: 'Tflite tutorial',
-      home: const HomePage(),
+      title: 'Sight Companion',
+      home: const HomeScreen(),
+      // home: DepthMapPage(),
       routes: {
         '/ocr': (context) => const Ocr(),
       },

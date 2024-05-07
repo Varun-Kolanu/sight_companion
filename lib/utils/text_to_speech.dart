@@ -5,19 +5,19 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:sight_companion/utils/tts_state.dart';
 
-class MyTts {
+class Tts {
   late FlutterTts flutterTts;
   String? engine;
   TtsState ttsState = TtsState.initialized;
 
   // Singleton instance
-  static final MyTts _instance = MyTts._internal();
+  static final Tts _instance = Tts._internal();
 
-  factory MyTts() => _instance;
+  factory Tts() => _instance;
 
   bool get isAndroid => !kIsWeb && Platform.isAndroid;
 
-  MyTts._internal() {
+  Tts._internal() {
     flutterTts = FlutterTts();
     initTts();
   }
@@ -70,10 +70,6 @@ class MyTts {
   }
 
   Future<void> speak(String text) async {
-    while (!(await flutterTts.isLanguageAvailable("en-US"))) {
-      await Future.delayed(const Duration(seconds: 1));
-      continue;
-    }
     var result = await flutterTts.speak(text);
     if (result == 1) {
       ttsState = TtsState.playing;

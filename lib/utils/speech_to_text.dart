@@ -8,7 +8,7 @@ typedef SpeechRecognitionResultCallback = void Function(
   String emitted,
 );
 
-class MyStt {
+class Stt {
   late SpeechToText stt;
   List<LocaleName> localeNames = [];
   String lastWords = "";
@@ -17,10 +17,10 @@ class MyStt {
   SpeechListenOptions listenOptions = SpeechListenOptions(
       cancelOnError: true, listenMode: ListenMode.dictation);
 
-  static final MyStt _instance = MyStt._internal();
+  static final Stt _instance = Stt._internal();
 
-  factory MyStt() => _instance;
-  MyStt._internal() {
+  factory Stt() => _instance;
+  Stt._internal() {
     stt = SpeechToText();
     initStt();
   }
@@ -31,8 +31,8 @@ class MyStt {
         onStatus: (status) {
           print('status: $status');
           if (status == 'done') {
-            lastWords = "";
             callback?.call(lastWords, SttState.stopped, 'done');
+            lastWords = "";
           } else {
             callback?.call(lastWords, SttState.listening, 'listening');
           }
@@ -40,8 +40,8 @@ class MyStt {
         },
         onError: (error) {
           print('error: $error');
-          lastWords = "";
           callback?.call(lastWords, SttState.stopped, 'stop');
+          lastWords = "";
           hasSpeech = false;
         },
       );

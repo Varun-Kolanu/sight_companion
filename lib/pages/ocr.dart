@@ -19,7 +19,7 @@ class OcrState extends State<Ocr> {
   final _textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
   RecognizedText? _recognizedText;
   String? _text;
-  final MyTts tts = MyTts();
+  final Tts tts = Tts();
   bool loading = false;
 
   Future<void> _pickImage() async {
@@ -77,9 +77,7 @@ class OcrState extends State<Ocr> {
                 ),
               ),
             ),
-            floatingActionButton: loading
-                ? const CircularProgressIndicator()
-                : const ListeningFloatingActionButton(),
+            floatingActionButton: const ListeningFloatingActionButton(),
           );
   }
 }
