@@ -1,9 +1,8 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
-// import 'package:sight_companion/pages/home2.dart';
 import 'package:sight_companion/pages/home_screen.dart';
-import 'package:sight_companion/pages/ocr.dart';
 import 'package:sight_companion/utils/object_detection.dart';
+import 'package:sight_companion/utils/ocr.dart';
 import 'package:sight_companion/utils/speech_to_text.dart';
 import 'package:sight_companion/utils/text_to_speech.dart';
 
@@ -22,13 +21,10 @@ class MyApp extends StatelessWidget {
     Tts();
     Stt();
     ObjectDetector();
-    return MaterialApp(
+    Ocr();
+    return const MaterialApp(
       title: 'Sight Companion',
-      home: const HomeScreen(),
-      // home: DepthMapPage(),
-      routes: {
-        '/ocr': (context) => const Ocr(),
-      },
+      home: HomeScreen(),
     );
   }
 }

@@ -70,6 +70,7 @@ class Tts {
   }
 
   Future<void> speak(String text) async {
+    await flutterTts.awaitSpeakCompletion(true);
     var result = await flutterTts.speak(text);
     if (result == 1) {
       ttsState = TtsState.playing;

@@ -11,6 +11,21 @@ int _colorDistance(Color a, Color b) {
       (a.blue - b.blue) * (a.blue - b.blue);
 }
 
+Map<String, Color> colorMap = {
+  'White': Colors.white,
+  'Black': Colors.black,
+  'Blue': Colors.blue,
+  'Red': Colors.red,
+  'Yellow': Colors.yellow,
+  'Grey': Colors.grey,
+  'Orange': Colors.orange,
+  'Purple': Colors.purple,
+  'Green': Colors.green,
+  'Brown': Colors.brown,
+  'Pink': Colors.pink,
+  'Cyan': Colors.cyan
+};
+
 Future<String> calculateDominantColor(XFile? imageFile) async {
   Uint8List bytes = await File(imageFile!.path).readAsBytes();
   ImageProvider<Object> imageProvider = MemoryImage(Uint8List.fromList(bytes));
@@ -19,20 +34,6 @@ Future<String> calculateDominantColor(XFile? imageFile) async {
   );
   Color? domColor = paletteGenerator.dominantColor?.color;
 
-  Map<String, Color> colorMap = {
-    'White': Colors.white,
-    'Black': Colors.black,
-    'Blue': Colors.blue,
-    'Red': Colors.red,
-    'Yellow': Colors.yellow,
-    'Grey': Colors.grey,
-    'Orange': Colors.orange,
-    'Purple': Colors.purple,
-    'Green': Colors.green,
-    'Brown': Colors.brown,
-    'Pink': Colors.pink,
-    'Cyan': Colors.cyan
-  };
   int minDistance = 200000;
   String nearestColor = '';
   for (var entry in colorMap.entries) {

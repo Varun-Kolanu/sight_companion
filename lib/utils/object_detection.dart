@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:sight_companion/utils/text_to_speech.dart';
 import 'package:tflite_v2/tflite_v2.dart';
 
 class ObjectDetector {
@@ -9,16 +11,15 @@ class ObjectDetector {
   Iterable<dynamic> classes = [];
   double _imageHeight = 0;
   double _imageWidth = 0;
+  final Tts _tts = Tts();
 
   static final ObjectDetector _instance = ObjectDetector._internal();
 
   factory ObjectDetector() => _instance;
-  ObjectDetector._internal() {
-    _loadModel();
-  }
+  ObjectDetector._internal();
 
-  Future<void> _loadModel() async {
-    Tflite.close();
+  Future<void> loadModel() async {
+    // Tflite.close();
     try {
       await Tflite.loadModel(
         model: "assets/model.tflite",
@@ -29,7 +30,16 @@ class ObjectDetector {
     }
   }
 
-  Future<void> predictImage(File image) async {
+  Future<void> predict(XFile? image) async {
+    await _predictImage(File(image!.path));
+    await _tts.speak("The objects infront of you are ");
+    for (String word in classes) {
+      await _tts.speak(word);
+      await Future.delayed(const Duration(seconds: 1));
+    }
+  }
+
+  Future<void> _predictImage(File image) async {
     FileImage(image)
         .resolve(const ImageConfiguration())
         .addListener(ImageStreamListener((ImageInfo info, bool _) {
@@ -49,8 +59,9 @@ class ObjectDetector {
         .map((re) => re["detectedClass"]);
   }
 
-  List<Widget> renderBoxes(Size screen) {
+  List<Widget> _renderBoxes(Size screen) {
     if (_recognitions == null) return [];
+    print("Not null");
 
     double factorX = screen.width;
     double factorY = _imageHeight / _imageWidth * screen.width;
@@ -83,5 +94,22 @@ class ObjectDetector {
         ),
       );
     }).toList();
+  }
+
+  List<Widget> stackChildrenObj(Size screen, File image) {
+    List<Widget> st = [];
+    st.add(
+      Positioned(
+        top: 0.0,
+        left: 0.0,
+        width: screen.width,
+        child: image.path.isEmpty
+            ? const Text('No image selected.')
+            : Image.file(image),
+      ),
+    );
+
+    st.addAll(_renderBoxes(screen));
+    return st;
   }
 }
