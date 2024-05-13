@@ -11,15 +11,16 @@ class MiDASModel {
 
   MiDASModel(this.interpreter);
 
-  Future<img.Image> getDepthMap(Uint8List inputImage) async {
+  Future<img.Image> getDepthMap(img.Image inputImage) async {
     return await run(inputImage);
   }
 
-  Future<img.Image> run(Uint8List inputImage) async {
-    print(inputImage);
-    img.Image image = img.decodeImage(inputImage)!;
-    img.Image resizedImage =
-        img.copyResize(image, width: inputImageDim, height: inputImageDim);
+  Future<img.Image> run(img.Image inputImage) async {
+    img.Image resizedImage = img.copyResize(
+      inputImage,
+      width: inputImageDim,
+      height: inputImageDim,
+    );
     // Normalize the resized image
     List<double> normalizedImage = _normalizeImage(resizedImage);
 
@@ -31,6 +32,7 @@ class MiDASModel {
 
     // Perform inference on the MiDAS model
     interpreter.run(inputTensor.buffer, outputTensor.buffer);
+    print(outputTensor);
 
     return _postprocess(outputTensor);
   }
@@ -43,9 +45,9 @@ class MiDASModel {
         num r = pixel.r;
         num g = pixel.g;
         num b = pixel.b;
-        normalizedImage.add((r - mean[0]) / std[0]);
-        normalizedImage.add((g - mean[1]) / std[1]);
-        normalizedImage.add((b - mean[2]) / std[2]);
+        normalizedImage.add((((r - mean[0]) / std[0]) + 2.2) / 5);
+        normalizedImage.add((((g - mean[1]) / std[1]) + 2.2) / 5);
+        normalizedImage.add((((b - mean[2]) / std[2]) + 2.2) / 5);
       }
     }
     return normalizedImage;
@@ -68,6 +70,7 @@ class MiDASModel {
     }
 
     Uint8List pixelBytes = Uint8List.fromList(processedPixels);
+    print(pixelBytes);
 
     // Convert processed pixels to an image
     return img.Image.fromBytes(
