@@ -56,9 +56,10 @@ class ObjectDetector {
       numResultsPerClass: 1,
     );
 
-    _recognitions = recognitions;
+    _recognitions =
+        recognitions!.where((re) => re["confidenceInClass"] >= 0.2).toList();
 
-    classes = recognitions!
+    classes = recognitions
         .where((re) => re["confidenceInClass"] >= 0.2)
         .map((re) => re["detectedClass"]);
   }
