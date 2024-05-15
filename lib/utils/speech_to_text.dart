@@ -71,6 +71,6 @@ class Stt {
     await stt.stop();
     print("Stopped Listening...");
     lastWords = "";
-    callback?.call(lastWords, SttState.stopped, 'done');
+    callback?.call(lastWords, SttState.stopped, 'stop');
   }
 }

@@ -19,14 +19,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tts();
-    // Stt();
-    // ObjectDetector();
-    // Ocr();
-    return MaterialApp(
+    Tts();
+    Stt();
+    ObjectDetector();
+    Ocr();
+    return const MaterialApp(
       title: 'Sight Companion',
-      // home: HomeScreen(),
-      home: DepthMapPage(),
+      home: HomeScreen(),
+      // home: DepthMapPage(),
     );
   }
 }
