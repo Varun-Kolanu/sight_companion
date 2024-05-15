@@ -22,8 +22,8 @@ class ObjectDetector {
     // Tflite.close();
     try {
       await Tflite.loadModel(
-        model: "assets/model.tflite",
-        labels: "assets/labels.txt",
+        model: "assets/yolo.tflite",
+        labels: "assets/yolo.txt",
       );
     } on PlatformException {
       print('Failed to load model.');
@@ -49,13 +49,17 @@ class ObjectDetector {
 
     var recognitions = await Tflite.detectObjectOnImage(
       path: image.path,
+      model: "YOLO",
+      threshold: 0.01,
+      imageMean: 0.0,
+      imageStd: 255.0,
       numResultsPerClass: 1,
     );
 
     _recognitions = recognitions;
 
     classes = recognitions!
-        .where((re) => re["confidenceInClass"] >= 0.45)
+        .where((re) => re["confidenceInClass"] >= 0.2)
         .map((re) => re["detectedClass"]);
   }
 
@@ -67,7 +71,7 @@ class ObjectDetector {
     double factorY = _imageHeight / _imageWidth * screen.width;
     Color blue = const Color.fromRGBO(37, 213, 253, 1.0);
     return _recognitions!.map((re) {
-      if (re["confidenceInClass"] < 0.45) {
+      if (re["confidenceInClass"] < 0.2) {
         return Container();
       }
       return Positioned(

@@ -1,6 +1,5 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
-import 'package:sight_companion/pages/depth_map.dart';
 import 'package:sight_companion/pages/home_screen.dart';
 import 'package:sight_companion/utils/object_detection.dart';
 import 'package:sight_companion/utils/ocr.dart';
@@ -26,7 +25,6 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       title: 'Sight Companion',
       home: HomeScreen(),
-      // home: DepthMapPage(),
     );
   }
 }
